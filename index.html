@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Календар за събития</title>
+    <link rel="stylesheet" href="style.css">
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">
+        <img src="img/trakia-uni.png" alt="Тракийски университет"></div>
+    <div class="user-info">Текущ потребител: Име на студент</div>
+</nav>
+
+<div class="layout">
+    
+    <div class="sidebar">
+        <button class="button-toggle" onclick="document.body.classList.toggle('viewer')">
+            👁 Превключи Admin / Viewer
+        </button>
+
+        <div id="form-box" class="panel">
+            <div class="panel-header">Създай Уведомление</div>
+            <div class="panel-body">
+                <input type="text" class="input-field" placeholder="Заглавие">
+                <textarea class="input-field" placeholder="Съдържание" rows="3"></textarea>
+                <select class="input-field" multiple style="height: 70px; margin-bottom: 10px;">
+    <option disabled selected>Избери категории</option>
+    <option value="exam">🚨 Изпит / Контролно</option>
+    <option value="lecture">📚 Извънредна лекция</option>
+    <option value="admin">⚙️ Административно</option>
+</select>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="check-date">
+                    <label for="check-date">Обвържи с дата</label>
+                    
+                    <div id="date-box">
+                        <input type="date" class="input-field">
+                    </div>
+                </div>
+                
+                <button class="button-primary">Запази</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="calendar-area">
+        <div id='calendar'></div>
+    </div>
+    
+</div>
+<footer class="site-footer">
+    <div class="footer-content">
+        <div class="copyright">
+            &copy; 2026 Тракийски университет - Академична Система.
+        </div>       
+    </div>
+</footer>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        new FullCalendar.Calendar(document.getElementById('calendar'), { initialView: 'dayGridMonth' }).render();
+    });
+</script>
+
+</body>
+</html>
