@@ -1,0 +1,35 @@
+/* ══════════════════════════════════════════
+   Base — reset, body, global helpers
+══════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--t1);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+::-webkit-scrollbar              { width: 5px; height: 5px; }
+::-webkit-scrollbar-track        { background: transparent; }
+::-webkit-scrollbar-thumb        { background: var(--s3); border-radius: 99px; }
+
+button, input, select, textarea  { font-family: inherit; }
+
+.hidden { display: none !important; }
+
+/* Reduced-motion: kill all animations / transitions */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:  .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}

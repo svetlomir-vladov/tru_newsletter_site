@@ -1,0 +1,23 @@
+/* ══════════════════════════════════════════
+    Background canvas
+══════════════════════════════════════════ */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Lift all page content above the canvas */
+#login-page,
+#app {
+  position: relative;
+  z-index: 1;
+}
+
+/* Remove the old static gradient — canvas handles ambient lighting now */
+#login-page {
+  background: none;
+}

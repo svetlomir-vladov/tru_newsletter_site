@@ -1,0 +1,33 @@
+/* ══════════════════════════════════════════
+   App Shell
+══════════════════════════════════════════ */
+
+/* ── App wrapper ── */
+#app {
+  display: none;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* ── Content area ── */
+.content-area {
+  flex: 1;
+  padding: 24px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── View enter animation ── */
+.view-enter { animation: vIn .25s ease forwards; }
+@keyframes vIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* ── Responsive overrides ── */
+@media (max-width: 600px) {
+  .content-area { padding: 14px; }
+  .topbar       { padding: 0 14px; gap: 8px; }
+  .topbar-clock { display: none; }
+}

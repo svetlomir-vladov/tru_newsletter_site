@@ -1,68 +1,106 @@
 <!DOCTYPE html>
-<html lang="bg">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Календар за събития</title>
-    <link rel="stylesheet" href="style.css">
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ClassBoard — Class Schedule</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- Styles (load order matters: variables first) -->
+  <link rel="stylesheet" href="css/variables.css"/>
+  <link rel="stylesheet" href="css/base.css"/>
+  <link rel="stylesheet" href="css/login.css"/>
+  <link rel="stylesheet" href="css/layout.css"/>
+
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="logo">
-        <img src="img/trakia-uni.png" alt="Тракийски университет"></div>
-    <div class="user-info">Текущ потребител: Име на студент</div>
-</nav>
+<!-- ══════════════════════════════════════════
+     LOGIN
+══════════════════════════════════════════ -->
+<div id="login-page">
+  <div class="login-card">
 
-<div class="layout">
-    
-    <div class="sidebar">
-        <button class="button-toggle" onclick="document.body.classList.toggle('viewer')">
-            👁 Превключи Admin / Viewer
-        </button>
-
-        <div id="form-box" class="panel">
-            <div class="panel-header">Създай Уведомление</div>
-            <div class="panel-body">
-                <input type="text" class="input-field" placeholder="Заглавие">
-                <textarea class="input-field" placeholder="Съдържание" rows="3"></textarea>
-                <select class="input-field" multiple style="height: 70px; margin-bottom: 10px;">
-    <option disabled selected>Избери категории</option>
-    <option value="exam">🚨 Изпит / Контролно</option>
-    <option value="lecture">📚 Извънредна лекция</option>
-    <option value="admin">⚙️ Административно</option>
-</select>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="check-date">
-                    <label for="check-date">Обвържи с дата</label>
-                    
-                    <div id="date-box">
-                        <input type="date" class="input-field">
-                    </div>
-                </div>
-                
-                <button class="button-primary">Запази</button>
-            </div>
-        </div>
+    <div class="login-logo">
+      <div class="login-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2">
+          <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+          <path d="M9 7h6M9 11h6M9 15h4"/>
+        </svg>
+      </div>
+      <span class="brand-name">Class<span>Board</span></span>
+      <span class="login-tagline">Class 10-B</span>
     </div>
 
-    <div class="calendar-area">
-        <div id='calendar'></div>
+    <h1 class="login-title">Welcome back</h1>
+    <p class="login-sub">Enter your student ID to access the class schedule.</p>
+
+    <div class="form-group">
+      <label class="form-label" for="sid-input">Student ID</label>
+      <input
+        type="text" id="sid-input" class="form-input"
+        placeholder="e.g. 2024001" maxlength="10"
+        autocomplete="off" autocapitalize="none"
+      />
+      <div class="form-error" id="login-err" role="alert">
+        Student ID not found. Please check and try again.
+      </div>
+      <p class="form-hint">Your student ID is printed on your school card.</p>
     </div>
-    
+
+    <button class="btn-primary" id="btn-login">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+      </svg>
+      Sign In
+    </button>
+
+    <div class="login-divider"><span>Quick demo access</span></div>
+    <div class="login-demo">
+      <button class="demo-btn" data-student-id="2024001"><strong>2024001</strong>Alex Johnson</button>
+      <button class="demo-btn" data-student-id="2024007"><strong>2024007</strong>Maria Garcia</button>
+      <button class="demo-btn" data-student-id="2024015"><strong>2024015</strong>Sam Patel</button>
+      <button class="demo-btn" data-student-id="2024023"><strong>2024023</strong>Jordan Lee</button>
+    </div>
+
+    <p class="login-footer">Contact your class admin if you have access issues.</p>
+  </div>
 </div>
-<footer class="site-footer">
-    <div class="footer-content">
-        <div class="copyright">
-            &copy; 2026 Тракийски университет - Академична Система.
-        </div>       
-    </div>
-</footer>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        new FullCalendar.Calendar(document.getElementById('calendar'), { initialView: 'dayGridMonth' }).render();
-    });
-</script>
 
+<!-- ══════════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- ── Top bar ── -->
+  <header class="topbar"></header>
+
+  <!-- ── Views ── -->
+  <div class="content-area">
+
+    <!-- TODAY -->
+    <div id="view-today" class="view-enter">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <h2 id="greeting-msg">Good morning!</h2>
+          <p id="greeting-date"></p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /app -->
+
+
+<!-- Toast container -->
+<div id="toast-wrap" aria-live="polite"></div>
+
+<!-- JS entry point (ES module) -->
+<script type="module" src="js/app.js"></script>
 </body>
 </html>

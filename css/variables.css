@@ -1,0 +1,37 @@
+/* ══════════════════════════════════════════
+   Design Tokens — edit here to retheme the app
+══════════════════════════════════════════ */
+:root {
+  /* Surfaces */
+  --bg:  #080808;
+  --s1:  #111114;
+  --s2:  #18181c;
+  --s3:  #1f1f24;
+
+  /* Borders */
+  --b1:  rgba(255, 255, 255, 0.07);
+  --b2:  rgba(255, 255, 255, 0.13);
+
+  /* Text */
+  --t1:  #f4f4f5;
+  --t2:  #a1a1aa;
+  --t3:  #71717a;
+
+  /* Brand / accent */
+  --ac:  #6366f1;
+  --ac2: #818cf8;
+
+  /* Semantic colours */
+  --green:  #22c55e;
+  --orange: #f97316;
+  --red:    #ef4444;
+  --yellow: #eab308;
+
+  /* Radii */
+  --r:   14px;
+  --rsm: 8px;
+  --rxs: 6px;
+
+  /* Default transition */
+  --tr: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
