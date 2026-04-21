@@ -99,20 +99,37 @@ const MOCK = {
       { time: '12:15', endTime: '13:00', classId: 'hist' },
       { time: '13:05', endTime: '13:50', classId: 'art'  },
     ],
-  }
+  },
+
+  deadlines: [
+    { date: '2025-04-11', title: 'Math — Chapter 7 Test',        classId: 'math', type: 'test',     note: 'Covers integrals & derivatives' },
+    { date: '2025-04-14', title: 'Physics Lab Report Due',        classId: 'phys', type: 'homework', note: 'Submit via email to Prof. Chen' },
+    { date: '2025-04-15', title: 'Literature Essay',             classId: 'lit',  type: 'homework', note: 'Min. 1000 words, MLA format' },
+    { date: '2025-04-17', title: 'CS Quiz — Algorithms',         classId: 'cs',   type: 'quiz',     note: '' },
+    { date: '2025-04-22', title: 'Chemistry Midterm',            classId: 'chem', type: 'test',     note: 'Chapters 1–5, no calculator' },
+    { date: '2025-04-25', title: 'History Project Presentation', classId: 'hist', type: 'project',  note: 'Groups of 3, 10 min each' },
+    { date: '2025-05-02', title: 'Art Portfolio Review',         classId: 'art',  type: 'project',  note: 'Bring physical portfolio' },
+    { date: '2025-05-06', title: 'Physics Final Exam',           classId: 'phys', type: 'test',     note: 'Full semester content' },
+    { date: '2025-05-09', title: 'Math Semester Exam',           classId: 'math', type: 'test',     note: 'All chapters' },
+    { date: '2025-05-16', title: 'Sports Day',                   classId: 'pe',   type: 'event',    note: 'Wear sports kit' },
+  ],
 };
 /* ─── end mock data ─────────────────────────────────────────────────────────── */
 
+/** In-memory cache; populated by loadAll(). */
 let _cache = null;
 
-/**
- * Authenticate a student by ID.
- * @returns {Promise<object|null>} student object or null if not found
- *
- * Backend endpoint: POST /api/auth/login  { studentId }
- * Expected response: { user: { id, name, initials } }
- */
+/* ══════════════════════════════════════════
+   Public API functions
+   Each function has two branches:
+     • USE_MOCK = true  → return data from MOCK
+     • USE_MOCK = false → call the real REST endpoint
+══════════════════════════════════════════ */
 
+/**
+ * Load all initial data for the app.
+ * Call once on boot; subsequent calls return the cached result.
+ */
 export async function loadAll() {
   if (_cache) return _cache;
 
@@ -122,13 +139,23 @@ export async function loadAll() {
     return _cache;
   }
 
-  const [schedule] = await Promise.all([
+  const [classes, schedule, teachers, deadlines] = await Promise.all([
+    fetch(`${API_BASE}/classes`).then(r => r.json()),
     fetch(`${API_BASE}/schedule`).then(r => r.json()),
+    fetch(`${API_BASE}/teachers`).then(r => r.json()),
+    fetch(`${API_BASE}/deadlines`).then(r => r.json()),
   ]);
-  _cache = { schedule };
+  _cache = { classes, schedule, teachers, deadlines };
   return _cache;
 }
 
+/**
+ * Authenticate a student by ID.
+ * @returns {Promise<object|null>} student object or null if not found
+ *
+ * Backend endpoint: POST /api/auth/login  { studentId }
+ * Expected response: { user: { id, name, initials } }
+ */
 export async function loginStudent(studentId) {
   if (USE_MOCK) {
     return MOCK.students.find(s => s.id === studentId) ?? null;
@@ -142,3 +169,36 @@ export async function loginStudent(studentId) {
   const { user } = await res.json();
   return user;
 }
+
+/**
+ * Persist a new deadline.
+ * @param {{ date, title, classId, type, note }} deadline
+ * @returns {Promise<object>} saved deadline (may include server-generated id)
+ *
+ * Backend endpoint: POST /api/deadlines
+ * Expected response: the saved deadline object
+ */
+export async function addDeadline(deadline) {
+  if (USE_MOCK) {
+    _cache.deadlines.push(deadline);
+    return deadline;
+  }
+  const res = await fetch(`${API_BASE}/deadlines`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(deadline),
+  });
+  if (!res.ok) throw new Error('Failed to save deadline');
+  const saved = await res.json();
+  _cache.deadlines.push(saved);
+  return saved;
+}
+
+/* ── Cache accessors (used by view modules) ── */
+export const getData      = () => _cache;
+export const getClasses   = () => _cache?.classes   ?? [];
+export const getSchedule  = () => _cache?.schedule  ?? {};
+export const getTeachers  = () => _cache?.teachers  ?? [];
+export const getDeadlines = () => _cache?.deadlines ?? [];
+export const getSchool    = () => _cache?.school    ?? {};
+export const getClass     = id => _cache?.classes.find(c => c.id === id);
