@@ -47,6 +47,16 @@ export async function doLogin(id) {
 }
 
 /**
+ * Log out the current user.
+ * Dispatches 'app:logout' so app.js can reset the UI.
+ */
+export function handleLogout() {
+  sessionStorage.removeItem(SESSION_KEY);
+  window.dispatchEvent(new CustomEvent('app:logout'));
+  toast('Signed out.');
+}
+
+/**
  * Read the saved session from sessionStorage.
  * Returns the user object if found, null otherwise.
  * @returns {object|null}
