@@ -1,23 +1,74 @@
 /* ══════════════════════════════════════════
    Login Page
 ══════════════════════════════════════════ */
+
+/* ── Page-level animations ── */
+@keyframes loginPageIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 #login-page {
   min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,.13) 0%, transparent 70%);
+  transition: opacity 0.46s cubic-bezier(0.4, 0, 1, 1);
+  animation: loginPageIn 0.3s ease both;
+}
+
+#login-page.exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Card entrance / exit animations ── */
+@keyframes loginCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes loginCardOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-24px) scale(1.06);
+    filter: blur(8px);
+  }
 }
 
 .login-card {
   width: 100%;
   max-width: 400px;
-  background: var(--s1);
-  border: 1px solid var(--b2);
+  background: rgba(14, 14, 20, 0.82);
+  border: 1px solid rgba(99, 102, 241, 0.22);
   border-radius: 20px;
   padding: 40px 36px;
-  box-shadow: 0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(99,102,241,.08);
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(99, 102, 241, 0.10),
+    0 0 120px rgba(99, 102, 241, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  animation: loginCardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+.login-card.exiting {
+  animation: loginCardOut 0.44s cubic-bezier(0.55, 0, 1, 0.45) forwards;
 }
 
 /* ── Brand ── */

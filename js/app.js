@@ -31,17 +31,21 @@ async function boot() {
   if (saved) {
     await loadAll();
     currentUser = saved;
-    showApp();
+    showApp(false); // session restore — no full animation
   }
 }
 
 /* ══════════════════════════════════════════
    Show / hide app
 ══════════════════════════════════════════ */
-function showApp() {
-  $('login-page').style.display = 'none';
-  $('app').style.display        = 'flex';
 
+/**
+ * @param {boolean} [fromLogin=false]
+ *   true  → full animated transition (login card exit + canvas bloom)
+ *   false → quick fade-in (page reload with saved session)
+ */
+function showApp(fromLogin = false) {
+  // Populate data immediately regardless of animation state
   $('user-av').textContent = currentUser.initials;
   $('user-nm').textContent = currentUser.name.split(' ')[0];
 
@@ -59,12 +63,59 @@ function showApp() {
   populateDlSelect();
   checkUrgent();
   startClock();
+
+  if (fromLogin) {
+    // Animate login card and page out
+    const card = document.querySelector('.login-card');
+    const page = $('login-page');
+    card.classList.add('exiting');
+    page.classList.add('exiting');
+
+    // After exit animation, reveal app
+    setTimeout(() => {
+      page.style.display = 'none';
+      page.classList.remove('exiting');
+      card.classList.remove('exiting');
+
+      // Switch canvas to app mode NOW — the app's fade-in covers the change
+      if (window.bgSetAppMode) window.bgSetAppMode();
+
+      $('app').style.display = 'flex';
+      $('app').classList.add('entering');
+      setTimeout(() => $('app').classList.remove('entering'), 600);
+    }, 520);
+
+  } else {
+    // Quick show (session restore on reload)
+    if (window.bgSetAppMode) window.bgSetAppMode();
+    $('login-page').style.display = 'none';
+    $('app').style.display        = 'flex';
+    $('app').classList.add('entering');
+    setTimeout(() => $('app').classList.remove('entering'), 500);
+  }
 }
 
 function hideApp() {
-  $('app').style.display        = 'none';
-  $('login-page').style.display = 'flex';
-  $('sid-input').value          = '';
+  const app = $('app');
+  app.classList.add('leaving');
+
+  setTimeout(() => {
+    app.style.display = 'none';
+    app.classList.remove('leaving');
+
+    const page = $('login-page');
+    page.style.display = 'flex';
+    $('sid-input').value = '';
+
+    // Return canvas to vibrant login mode
+    if (window.bgSetLoginMode) window.bgSetLoginMode();
+
+    // Re-trigger card entrance animation
+    const card = document.querySelector('.login-card');
+    card.style.animation = 'none';
+    void card.offsetWidth; // force reflow
+    card.style.animation = '';
+  }, 330);
 }
 
 /* ══════════════════════════════════════════
@@ -160,7 +211,7 @@ function bindStaticEvents() {
   window.addEventListener('app:login', async e => {
     await loadAll();
     currentUser = e.detail;
-    showApp();
+    showApp(true); // from login — full animated transition
   });
   window.addEventListener('app:logout', hideApp);
 

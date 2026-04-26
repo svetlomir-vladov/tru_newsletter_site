@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════
-    Background canvas
+   Animated background canvas
 ══════════════════════════════════════════ */
 #bg-canvas {
   position: fixed;
@@ -17,7 +17,27 @@
   z-index: 1;
 }
 
-/* Remove the old static gradient — canvas handles ambient lighting now */
+/* Remove static gradient — canvas handles ambient lighting */
 #login-page {
   background: none;
+}
+
+/* ── App shell transition animations ── */
+@keyframes appFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes appFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+#app.entering {
+  animation: appFadeIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+#app.leaving {
+  animation: appFadeOut 0.30s ease forwards;
+  pointer-events: none;
 }
