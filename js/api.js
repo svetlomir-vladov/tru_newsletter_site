@@ -94,6 +94,21 @@ const MOCK = {
 /** In-memory cache; populated by loadAll(). */
 let _cache = null;
 
+function attachTeachers(data) {
+  const teacherByClassId = new Map();
+  (data.teachers || []).forEach(teacher => {
+    (teacher.classIds || []).forEach(classId => teacherByClassId.set(classId, teacher.name));
+  });
+
+  return {
+    ...data,
+    classes: (data.classes || []).map(cls => ({
+      ...cls,
+      teacher: cls.teacher || teacherByClassId.get(cls.id) || '',
+    })),
+  };
+}
+
 /* ══════════════════════════════════════════
    Public API functions
    Each function has two branches:
@@ -110,7 +125,7 @@ export async function loadAll() {
 
   if (USE_MOCK) {
     // Deep clone so views can mutate deadlines without corrupting the source
-    _cache = JSON.parse(JSON.stringify(MOCK));
+    _cache = attachTeachers(JSON.parse(JSON.stringify(MOCK)));
     return _cache;
   }
 
@@ -120,7 +135,7 @@ export async function loadAll() {
     fetch(`${API_BASE}/teachers`).then(r => r.json()),
     fetch(`${API_BASE}/deadlines`).then(r => r.json()),
   ]);
-  _cache = { classes, schedule, teachers, deadlines };
+  _cache = attachTeachers({ classes, schedule, teachers, deadlines });
   return _cache;
 }
 

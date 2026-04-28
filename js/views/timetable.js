@@ -7,14 +7,20 @@ import { getSchedule, getClass } from '../api.js';
 
 /* ─── Mobile state ───────────────────────────── */
 let mobileTTDay = todayDayIdx();
+let nowTimerId = null;
 
 /* ════════════════════════════════════════
    Desktop — proportional time grid
 ════════════════════════════════════════ */
 export function renderTimetable() {
-  const todayIdx = new Date().getDay() - 1; // 0=Mon, -1=Sun, 5=Sat
+  const todayIdx = todayDayIdx();
   const wrap     = document.getElementById('tt-wrap');
   wrap.innerHTML = '';
+
+  if (nowTimerId !== null) {
+    clearInterval(nowTimerId);
+    nowTimerId = null;
+  }
 
   // Hour marks for the time axis (every 30 min)
   const hourMarks = [];
@@ -88,7 +94,7 @@ export function renderTimetable() {
         nowLine.className = 'tt-now-line';
         nowLine.style.top = `${(nm - GRID_START) * PPM}px`;
         col.appendChild(nowLine);
-        setInterval(() => {
+        nowTimerId = setInterval(() => {
           const n = nowMins();
           nowLine.style.top = `${(n - GRID_START) * PPM}px`;
         }, 60_000);
