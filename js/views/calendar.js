@@ -2,7 +2,7 @@
    Deadlines / Calendar View
 ══════════════════════════════════════════ */
 import { $, p, todayStr, daysUntil, toast, openModal, closeModal } from '../utils.js';
-import { getDeadlines, getClasses, getClass, addDeadline } from '../api.js';
+import { getDeadlines, getClasses, getClass, addDeadline, deleteDeadline } from '../api.js';
 import { renderTodayStats, renderUpcomingDl } from './today.js';
 
 let calendarDate = new Date();
@@ -64,6 +64,17 @@ export function calNav(dir) {
   renderCalendar();
 }
 
+function refreshBadge() {
+  const n = getDeadlines().filter(d => {
+    const days = daysUntil(d.date);
+    return days >= 0 && days <= 3;
+  }).length;
+  const dot   = document.getElementById('notif-dot');
+  const badge = document.getElementById('dl-badge');
+  if (dot)   dot.classList.toggle('hidden', !n);
+  if (badge) { badge.textContent = n; badge.classList.toggle('hidden', !n); }
+}
+
 /** Bind once — event delegation on the calendar grid. */
 export function initCalendarView() {
   $('cal-days').addEventListener('click', e => {
@@ -71,6 +82,22 @@ export function initCalendarView() {
     if (!cell) return;
     const dls = getDeadlines().filter(d => d.date === cell.dataset.date);
     if (dls.length) toast(dls.map(d => d.title).join(' · '));
+  });
+
+  $('dl-list').addEventListener('click', async e => {
+    const btn = e.target.closest('.dl-del-btn');
+    if (!btn) return;
+    const id = Number(btn.dataset.id);
+    try {
+      await deleteDeadline(id);
+      renderCalendar();
+      renderDlList();
+      renderUpcomingDl();
+      renderTodayStats();
+      refreshBadge();
+    } catch {
+      toast('Could not delete deadline.');
+    }
   });
 
   $('cal-prev').addEventListener('click', () => calNav(-1));
@@ -105,6 +132,9 @@ export function renderDlList() {
         <span class="dl-chip chip-${d.type}">${d.type}</span>
         <span style="font-size:11px;color:${col}">${lbl}</span>
       </div>
+      <button class="dl-del-btn" data-id="${d.id}" aria-label="Delete deadline"
+        style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:18px;line-height:1;padding:0 4px;flex-shrink:0;margin-left:6px"
+        title="Delete">×</button>
     </div>`;
   });
 

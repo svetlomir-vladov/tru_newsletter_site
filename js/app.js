@@ -7,7 +7,7 @@ import { $, toast, closeModal } from './utils.js';
 import { loadAll, getDeadlines } from './api.js';
 import { daysUntil } from './utils.js';
 
-import { handleLogin, quickLogin, handleLogout, getStoredUser } from './auth.js';
+import { handleLogin, quickLogin, handleLogout, restoreSession } from './auth.js';
 
 import { initTodayView, renderGreeting, renderDayPicker, renderTodayStats, renderTimeline, renderUpcomingDl } from './views/today.js';
 import { renderClasses }                                                                                        from './views/classes.js';
@@ -26,8 +26,8 @@ let currentUser = null;
 async function boot() {
   bindStaticEvents();
 
-  // Restore session (tab reload)
-  const saved = getStoredUser();
+  // Restore session (tab reload) — verified against server
+  const saved = await restoreSession();
   if (saved) {
     await loadAll();
     currentUser = saved;

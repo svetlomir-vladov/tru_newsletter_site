@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ClassBoard</title>
+
+    <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- Styles (load order matters: variables first) -->
+  <link rel="stylesheet" href="css/variables.css"/>
+  <link rel="stylesheet" href="css/base.css"/>
+  <link rel="stylesheet" href="css/login.css"/>
+  <link rel="stylesheet" href="css/layout.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/timetable.css"/>
+  <link rel="stylesheet" href="css/calendar.css"/>
+  <link rel="stylesheet" href="css/background.css"/>
+</head>
+<body>
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+<!-- ══════════════════════════════════════════
+     LOGIN
+══════════════════════════════════════════ -->
+<div id="login-page">
+  <div class="login-card">
+
+    <div class="login-logo">
+      <div class="login-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2">
+          <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+          <path d="M9 7h6M9 11h6M9 15h4"/>
+        </svg>
+      </div>
+      <span class="brand-name">Class<span>Board</span></span>
+      <span class="login-tagline">ТРУ·ИТ</span>
+    </div>
+
+    <h1 class="login-title">Welcome back</h1>
+    <p class="login-sub">Enter your student ID to access the class schedule.</p>
+
+    <div class="form-group">
+      <label class="form-label" for="sid-input">Student ID</label>
+      <input
+        type="text" id="sid-input" class="form-input"
+        placeholder="e.g. 240500810000" maxlength="20"
+        autocomplete="off" autocapitalize="none"
+      />
+      <div class="form-error" id="login-err" role="alert">
+        Student ID not found. Please check and try again.
+      </div>
+      <p class="form-hint">Your student ID is printed on your school card.</p>
+    </div>
+
+    <button class="btn-primary" id="btn-login">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+      </svg>
+      Sign In
+    </button>
+
+    <p class="login-footer">Contact your class admin if you have access issues.</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- ── Top bar ── -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2">
+          <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+        </svg>
+      </div>
+      <span class="topbar-name">Class<span>Board</span></span>
+    </div>
+    <span class="topbar-pill">ИТ</span>
+    <div class="topbar-right">
+      <span class="topbar-clock" id="live-clock"></span>
+      <button class="notif-btn" id="btn-notif" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 01-3.46 0"/>
+        </svg>
+        <span class="notif-dot hidden" id="notif-dot"></span>
+      </button>
+      <div class="user-pill">
+        <div class="user-avatar" id="user-av">?</div>
+        <span class="user-name" id="user-nm">Student</span>
+      </div>
+      <button class="logout-btn" id="btn-logout">Sign out</button>
+    </div>
+  </header>
+
+  <!-- ── Navigation tabs ── -->
+  <nav class="nav-tabs" role="tablist">
+    <button class="nav-tab active" data-view="today">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Today
+    </button>
+    <button class="nav-tab" data-view="classes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+      Classes
+    </button>
+    <button class="nav-tab" data-view="timetable">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Timetable
+    </button>
+    <button class="nav-tab" data-view="calendar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      Deadlines
+      <span class="nav-badge hidden" id="dl-badge">0</span>
+    </button>
+    <button class="nav-tab" data-view="teachers">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Teachers
+    </button>
+  </nav>
+
+  <!-- ── Views ── -->
+  <div class="content-area">
+
+    <!-- TODAY -->
+    <div id="view-today" class="view-enter">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <h2 id="greeting-msg">Good morning!</h2>
+          <p id="greeting-date"></p>
+        </div>
+        <div class="day-picker">
+          <button class="dp-arrow" id="dp-prev" aria-label="Previous day">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="dp-days" id="dp-days"></div>
+          <button class="dp-arrow" id="dp-next" aria-label="Next day">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="today-stats" id="today-stats"></div>
+
+      <div class="today-grid">
+        <div>
+          <div class="section-label" id="timeline-label">Today's Schedule </div>
+          <div class="timeline" id="timeline"></div>
+        </div>
+        <div>
+          <div class="section-label">Upcoming Deadlines</div>
+          <div class="deadlines-panel" id="upcoming-dl"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLASSES -->
+    <div id="view-classes" class="hidden view-enter">
+      <div class="classes-grid" id="classes-grid"></div>
+    </div>
+
+    <!-- TIMETABLE -->
+    <div id="view-timetable" class="hidden view-enter">
+      <div class="tt-wrap" id="tt-wrap"></div>
+      <div class="tt-mobile" id="tt-mobile"></div>
+    </div>
+
+    <!-- DEADLINES / CALENDAR -->
+    <div id="view-calendar" class="hidden view-enter">
+      <div class="calendar-layout">
+        <div>
+          <div class="cal-nav">
+            <span class="cal-month" id="cal-month"></span>
+            <div class="cal-nav-btns">
+              <button class="cal-btn" id="cal-prev" aria-label="Previous month">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button class="cal-btn" id="cal-next" aria-label="Next month">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-wds">
+              <div class="cal-wd">Mon</div><div class="cal-wd">Tue</div><div class="cal-wd">Wed</div>
+              <div class="cal-wd">Thu</div><div class="cal-wd">Fri</div>
+              <div class="cal-wd" style="color:var(--t3)">Sat</div>
+              <div class="cal-wd" style="color:var(--t3)">Sun</div>
+            </div>
+            <div class="cal-days" id="cal-days"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div class="section-label" style="margin-bottom:0">All Deadlines</div>
+            <button class="btn-accent" id="btn-add-dl" style="padding:6px 16px;font-size:13px">+ Add</button>
+          </div>
+          <div class="dl-list-panel" id="dl-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEACHERS -->
+    <div id="view-teachers" class="hidden view-enter">
+      <div class="teachers-grid" id="teachers-grid"></div>
+    </div>
+
+  </div><!-- /content-area -->
+</div><!-- /app -->
+
+
+<!-- ══════════════════════════════════════════
+     ADD DEADLINE MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-dl">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">Add Deadline</span>
+      <button class="modal-close" id="btn-close-modal-dl" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="dl-title">Title *</label>
+      <input class="form-input" type="text" id="dl-title" placeholder="e.g. Math Test — Chapter 5"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="dl-date">Date *</label>
+        <input class="form-input" type="date" id="dl-date"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="dl-type">Type</label>
+        <select class="form-select" id="dl-type">
+          <option value="test">Test / Exam</option>
+          <option value="homework">Homework</option>
+          <option value="quiz">Quiz</option>
+          <option value="project">Project</option>
+          <option value="presentation">Presentation</option>
+          <option value="event">Event</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="dl-class">Subject</label>
+      <select class="form-select" id="dl-class"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="dl-note">Note (optional)</label>
+      <input class="form-input" type="text" id="dl-note" placeholder="e.g. Chapters 1–4, open book"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" id="btn-cancel-dl">Cancel</button>
+      <button class="btn-accent" id="btn-submit-dl">Add Deadline</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-wrap" aria-live="polite"></div>
+
+<!-- Animated background (runs independently, no module needed) -->
+<script src="js/background.js"></script>
+<!-- JS entry point (ES module) -->
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
